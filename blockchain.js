@@ -41,13 +41,13 @@ class Blockchain {
 
             const actualLastHash = chain[i-1].hash; //getting the previous hash
 
-            const { timestamp, lastHash, hash, data } = block; //destructuring the block variables
+            const { timestamp, lastHash, hash, nonce, difficulty, data } = block; //destructuring the block variables
 
             if(lastHash !== actualLastHash) {
                 return false;
             }
 
-            const validatedHash = cryptoHash(timestamp, lastHash, data); //need this to check the hash is correct
+            const validatedHash = cryptoHash(timestamp, lastHash, nonce, difficulty, data); //need this to check the hash is correct
 
             if(hash !== validatedHash) return false //checking if the hash is correct
         }

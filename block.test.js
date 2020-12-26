@@ -1,17 +1,21 @@
 const Block = require("./block")
-const { GENESIS_DATA } = require("./config");
+const { GENESIS_DATA, MINE_RATE } = require("./config");
 const cryptoHash = require("./crypto-hash");
 
 describe("Block", () => {
-    const timestamp = "a-date";
+    const timestamp = 2000;
     const hash = "bar-hash";
     const lastHash = "last-bar-hash";
     const data = ["foo-data", "blockchain"];
+    const nonce = 1;
+    const difficulty = 1;
     const block = new Block({
         timestamp: timestamp,
         hash: hash,
         lastHash: lastHash,
         data: data,
+        nonce: nonce,
+        difficulty: difficulty
     });
 
     //it is the test function and takes a description and a callback function, expect is the outcome of our test. Usually only one expect per test but this example is easy
@@ -20,6 +24,8 @@ describe("Block", () => {
         expect(block.hash).toEqual(hash)
         expect(block.lastHash).toEqual(lastHash)
         expect(block.data).toEqual(data)
+        expect(block.nonce).toEqual(nonce)
+        expect(block.difficulty).toEqual(difficulty)
     });
 
     describe("genesis()", () => {
@@ -57,7 +63,47 @@ describe("Block", () => {
 
         it("creates a SHA-265 `hash` based on the proper inputs", () => {
             expect(minedBlock.hash)
-                .toEqual(cryptoHash(minedBlock.timestamp, lastBlock.hash, data));
+                .toEqual(
+                    cryptoHash(
+                        minedBlock.timestamp,
+                        minedBlock.nonce,
+                        minedBlock.difficulty,
+                        lastBlock.hash, 
+                        data
+                    )
+                );
+        });
+
+        it("sets a `hash` that meets the difficulty criteria", () => {
+            expect(minedBlock.hash.substring(0, minedBlock.difficulty)).toEqual("0".repeat(minedBlock.difficulty));
+        });
+
+        it("adjusts the difficulty", () => {
+            const possibleResutls = [lastBlock.difficulty + 1, lastBlock.difficulty - 1];
+            
+            expect(possibleResutls.includes(minedBlock.difficulty)).toBe(true);
+        });
+    });
+
+    describe("adjustDifficulty()", () => {
+        it("raises the difficulty for a quickly mined block", () => {
+            expect(Block.adjustDifficulty({ 
+                originalBlock: block,
+                timestamp: block.timestamp + MINE_RATE - 100, //we subtract 100ms from the MINE_RATE in order to make sure the block has been mined faster than target value
+            })).toEqual(block.difficulty + 1)
+        });
+
+        it("lowers the difficulty for a slowly mined block", () => {
+            expect(Block.adjustDifficulty({ 
+                originalBlock: block,
+                timestamp: block.timestamp + MINE_RATE + 100, //we add 100ms from the MINE_RATE in order to make sure the block has been mined slower than target value
+            })).toEqual(block.difficulty - 1)
+        });
+
+        it("has a lower limit of 1", () => {
+            block.difficulty = -1;
+
+            expect(Block.adjustDifficulty({ originalBlock: block })).toEqual(1)
         });
     });
 
