@@ -5,7 +5,7 @@ const cryptoHash = (...inputs) => {
 
     hash.update(inputs.sort().join(" ")); //creates an hash that we can access based on a string argument, creates an hash
 
-    return hash.digest("hex"); //digest is used to represent the result of an hash
+    return hash.digest("hex"); //digest is used to represent the result of an hash, we convert into hexToBinary only when checking the difficulty
 };
 
 module.exports = cryptoHash;

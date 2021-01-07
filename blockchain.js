@@ -40,12 +40,13 @@ class Blockchain {
             const block = chain[i]; //getting the block at index i
 
             const actualLastHash = chain[i-1].hash; //getting the previous hash
+            const lastDifficulty = chain[i-1].difficulty //getting prevuous difficulty
 
             const { timestamp, lastHash, hash, nonce, difficulty, data } = block; //destructuring the block variables
 
-            if(lastHash !== actualLastHash) {
-                return false;
-            }
+            if(lastHash !== actualLastHash) { return false; } //we check validity of the previous hash
+
+            if(Math.abs(lastDifficulty - difficulty) > 1) return false; // we check if there has been a jump in difficulty grater than 1
 
             const validatedHash = cryptoHash(timestamp, lastHash, nonce, difficulty, data); //need this to check the hash is correct
 

@@ -1,5 +1,7 @@
+const hexToBinary = require("hex-to-binary"); //this module installed with npm allows for conversion from hex to binary
 const { GENESIS_DATA, MINE_RATE } = require("./config");
 const cryptoHash = require("./crypto-hash");
+
 
 class Block {
     constructor({ timestamp, lastHash, hash, data, nonce, difficulty }) { //mapping the arguments {timestamp...} allowes us to change the order later if needed
@@ -28,7 +30,7 @@ class Block {
             timestamp = Date.now();
             difficulty = Block.adjustDifficulty({ originalBlock: lastBlock, timestamp: timestamp });
             hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty); //every iteration of the loop the hash will change
-        } while (hash.substring(0, difficulty) !== "0".repeat(difficulty)); //checking if the substring of the hash has the correct leading "0s" as the difficulty requires
+        } while (hexToBinary(hash).substring(0, difficulty) !== "0".repeat(difficulty)); //checking if the substring of the hash has the correct leading "0s" as the difficulty requires, also we converted the hash from hex to binary
         
         return new this({ //this returns a new instance of the Block class
             timestamp: timestamp,
