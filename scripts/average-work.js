@@ -1,6 +1,6 @@
 //This file is for testing purposed, we can run with console.logs in order to check functionality
 
-const Blockchain = require("./blockchain");
+const Blockchain = require("../blockchain");
 
 const blockchain = new Blockchain();
 
