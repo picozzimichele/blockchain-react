@@ -1,11 +1,12 @@
 const { v1: uuidv1 } = require('uuid');
 const { verifySignature } = require("../utility");
+const { REWARD_INPUT, MINING_REWARD } = require("../config");
 
 class Transaction {
-    constructor({ senderWallet, recipient, amount }) {
+    constructor({ senderWallet, recipient, amount, outputMap, input }) {
         this.id = uuidv1();
-        this.outputMap = this.createOutputMap({ senderWallet, recipient, amount });
-        this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
+        this.outputMap = outputMap || this.createOutputMap({ senderWallet, recipient, amount });
+        this.input = input || this.createInput({ senderWallet, outputMap: this.outputMap });
     }
 
     createOutputMap({ senderWallet, recipient, amount }) { //this is the data that we are signing as part of the transaction
@@ -61,6 +62,13 @@ class Transaction {
         }
 
         return true;
+    }
+
+    static rewardTransaction({ minerWallet }) {
+        return new this({
+            input: REWARD_INPUT, //this is the reward address
+            outputMap: { [minerWallet.publicKey]: MINING_REWARD } //we set the reward for the mining reward for the minerWallet 
+        });
     }
 }
 

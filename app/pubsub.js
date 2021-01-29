@@ -29,7 +29,11 @@ class PubSub {
 
         switch(channel) { //the switch replaces multiple if statements
             case CHANNELS.BLOCKCHAIN:
-                this.blockchain.replaceChain(parsedMessage);
+                this.blockchain.replaceChain(parsedMessage, true, () => {
+                    this.transactionPool.clearBlockchainTransactions({ //this way we clear the transaction pools that have been added to the chain from the Pool from the network
+                        chain: parsedMessage
+                    });
+                });
                 break;
             case CHANNELS.TRANSACTION:
                 this.transactionPool.setTransaction(parsedMessage);
