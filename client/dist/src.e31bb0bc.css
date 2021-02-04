@@ -29,4 +29,18 @@ body {
     margin: 2%;
 }
 
+.Transaction {
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+a, a:hover {
+    color: #e66;
+    text-decoration: underline;
+}
+
+.ConductTransaction, .TransactionPool {
+    margin: 10%
+}
+
 /*# sourceMappingURL=/src.e31bb0bc.css.map */
