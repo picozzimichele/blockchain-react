@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll",
-    "start": "npm run build-client && node index.js",
-    "dev": "npm run dev-client & npm run start-redis && nodemon index.js",
-    "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon index.js",
+    "start": "npm run build-client & node index.js",
+    "dev": "npm run dev-client & npm run start-redis && cross-env ENV='development' nodemon index.js",
+    "dev-peer": "cross-env GENERATE_PEER_PORT='true' ENV='development' nodemon index.js",
     "start-redis": "redis-server --daemonize yes",
     "build-client": "npm run clean && parcel build client/src/index.html --out-dir client/dist",
     "dev-client": "npm run clean && parcel client/src/index.html --out-dir client/dist",
@@ -19,8 +19,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
     "cross-env": "^7.0.3",
     "jest": "^23.6.0",
     "nodemon": "^2.0.7"
@@ -29,6 +27,8 @@
     "@types/react-dom": "^17.0.0",
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
     "body": "^5.1.0",
     "elliptic": "^6.5.3",
     "express": "^4.17.1",
