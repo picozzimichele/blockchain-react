@@ -32,6 +32,25 @@ app.get("/api/blocks", (req, res) => { //res allows us to specify how the get re
     res.json(blockchain.chain); //this will send the chain in json format
 }); 
 
+app.get("/api/blocks/length", (req, res) => {
+    res.json(blockchain.chain.length);
+});
+
+app.get("/api/blocks/:id", (req, res) => {
+    const { id } = req.params;
+    const { length } = blockchain.chain;
+
+    const blocksReversed = blockchain.chain.slice().reverse(); //we do not want to touch the original blockchain so we use slice() to make a copy of it just for display purposes
+
+    let startIndex = (id - 1) * 5;
+    let endIndex = id * 5;
+
+    startIndex = startIndex < length ? startIndex : length;
+    endIndex = endIndex < length ? endIndex : length;
+
+    res.json(blocksReversed.slice(startIndex, endIndex));
+});
+
 app.post("/api/mine", (req, res) => {
     const { data } = req.body; //destructuring req.body, specified in POSTMAN
 
@@ -67,7 +86,7 @@ app.post("/api/transact", (req, res) => {
     pubsub.broadcastTransaction(transaction); //we broadcast the transaction updates to the network using the pubsub class form app/pubsub
 
     res.json({ type: "success", transaction });
-})
+});
 
 app.get("/api/transaction-pool-map", (req, res) => {
     res.json(transactionPool.transactionMap);
@@ -86,6 +105,20 @@ app.get("/api/wallet-info", (req, res) => {
         address: address, 
         balance: Wallet.calculateBalance({ chain: blockchain.chain, address: address })
     })
+})
+
+app.get("/api/known-addresses", (req, res) => {
+    const addressMap = {};
+
+    for (let block of blockchain.chain) {
+        for (let transaction of block.data) {
+            const recipient = Object.keys(transaction.outputMap);
+
+            recipient.forEach(recipient => addressMap[recipient] = recipient);
+        }
+    }
+
+    res.json(Object.keys(addressMap));
 })
 
 app.get("*", (req, res) => {
@@ -139,7 +172,7 @@ if (isDevelopment) {
         wallet: walletBar, recipient: wallet.publicKey, amount: 15
     })
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
         if (i % 3 === 0) {
             walletAction();
             walletFooAction();
